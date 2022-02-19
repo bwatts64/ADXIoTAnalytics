@@ -93,9 +93,18 @@ resource eventHubsDataReceiverRoleDefinition 'Microsoft.Authorization/roleDefini
   name: 'a638d3c7-ab3a-418d-83e6-5f17a39d4fde'
 }
 
+resource storageDataContributorRoleDefinition 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+  scope: subscription()
+  name: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
+}
+
 // Get Event Hub Reference (deployed in Module)
 resource eventHubReference 'Microsoft.EventHub/namespaces@2021-11-01'  existing = {
   name: '${eventHubName}${deploymentSuffix}'
+}
+
+resource storageReference 'Microsoft.Storage/storageAccounts@2021-08-01' existing = {
+  name: '${saName}${deploymentSuffix}'
 }
 
 // Grant Azure Event Hubs Data receiver role to ADX
@@ -105,6 +114,15 @@ resource roleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-prev
   properties: {
     roleDefinitionId: eventHubsDataReceiverRoleDefinition.id
     principalId: adxCluster.outputs.adxClusterIdentity
+  }
+}
+
+resource saRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = if(deploySynapse){
+  name: guid(resourceGroup().id, principalId, storageDataContributorRoleDefinition.id)
+  scope: storageReference
+  properties: {
+    roleDefinitionId: storageDataContributorRoleDefinition.id
+    principalId: syanpse.outputs.synapseSystemId
   }
 }
 

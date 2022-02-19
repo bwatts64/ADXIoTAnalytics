@@ -19,6 +19,56 @@ resource synapseWorkspace 'Microsoft.Synapse/workspaces@2021-06-01' = {
      }
      sqlAdministratorLogin: 'sqladmin'
      sqlAdministratorLoginPassword: 'ADXDemo1234'
+     managedResourceGroupName: '${synapseName}rg'
+     managedVirtualNetwork: 'default'
+  }
+  resource firewall 'firewallRules@2021-06-01' = {
+    name: 'allowAll'
+    properties: {
+      startIpAddress: '0.0.0.0'
+      endIpAddress: '0.0.0.0'
+    }
+  }
+  resource managedIdentitySQLControl 'managedIdentitySqlControlSettings@2021-06-01' = {
+    name: 'default'
+    properties: {
+      grantSqlControlToManagedIdentity: {
+        desiredState: 'Enabled'
+      }
+    }
+  }
+  resource sqlPool 'sqlPools' = {
+    name: 'demoSqlPool'
+    location: location
+    sku: {
+       name: 'DW200c'
+       capacity: 0
+    }
+  }
+  resource spartk 'bigDataPools@2021-06-01' = {
+    name: 'demoSpark'
+    location: location
+    properties: {
+      sparkVersion: '3.1'
+      nodeCount: 10
+      nodeSize: 'Small'
+      nodeSizeFamily: 'MemoryOptimized'
+      autoScale: {
+        enabled: true
+        minNodeCount: 3
+        maxNodeCount: 10
+      }
+      autoPause: {
+        enabled: true
+        delayInMinutes: 15
+      }
+      isComputeIsolationEnabled: false
+      sessionLevelPackagesEnabled: false
+      cacheSize: 0
+      dynamicExecutorAllocation: {
+        enabled: false
+      }
+    }
   }
   resource adxPool 'kustoPools@2021-06-01-preview' = {
     name: adxName
@@ -49,6 +99,8 @@ resource synapseWorkspace 'Microsoft.Synapse/workspaces@2021-06-01' = {
     }
   }
 }
+
+output synapseSystemId string = synapseWorkspace.identity.principalId
 
 
 

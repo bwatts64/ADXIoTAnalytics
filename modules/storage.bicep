@@ -10,12 +10,21 @@ resource storageaccount 'Microsoft.Storage/storageAccounts@2021-06-01' = {
   sku: {
     name: 'Standard_LRS'
   }
-  properties: {}
+  properties: {
+    isHnsEnabled: true
+  }
 
 }
 
 resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-06-01' = {
   name: '${saname}/default/adxscript'
+  dependsOn: [
+    storageaccount
+  ]
+}
+
+resource synapsecontainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-06-01' = {
+  name: '${saname}/default/synapse'
   dependsOn: [
     storageaccount
   ]
