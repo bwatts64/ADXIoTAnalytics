@@ -56,7 +56,7 @@ function deploy_azure_services() {
             --template-file main.bicep \
             --parameters deploymentSuffix=$randomNum principalId=$principalId @iotanalyticsStore.parameters.json \
             --only-show-errors --output none
-    else if [ $iotCType -eq 2 ]
+    elif [ $iotCType -eq 2 ]
     then
         az deployment group create -n $deploymentName -g $rgName \
             --template-file main.bicep \
@@ -267,7 +267,7 @@ banner # Show Welcome banner
 if [ $iotCType -eq 1 ]
 then
     echo '1. Starting deployment of IoT Analytics Lab'
-else if [ $iotCType -eq 2 ]
+elif [ $iotCType -eq 2 ]
 then
     echo '1. Starting deployment of IoT Open Hack Environment'
 else
@@ -310,7 +310,7 @@ then
     deploy_thermostat_devices # Deploy Thermostat simulated devices
     configure_IoT_Central_output & # On IoT Central, create an Event Hub export and destination with json payload
     spinner " Creating IoT Central App export and destination on IoT Central: $iotCentralName ($iotCentralAppID)"
-else if [ $deployIoT == true ]
+elif [ $deployIoT == true ]
 then
     echo "Creating $numDevices devices on IoT Central: $iotCentralName ($iotCentralAppID)"
     deploy_thermostat_devices # Deploy Thermostat simulated devices

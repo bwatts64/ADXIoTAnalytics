@@ -8,6 +8,9 @@ param saName string
 resource synapseWorkspace 'Microsoft.Synapse/workspaces@2021-06-01' = {
   name: synapseName
   location: location
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
      defaultDataLakeStorage: {
        resourceId: saResourceId
