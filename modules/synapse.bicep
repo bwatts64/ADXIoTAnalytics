@@ -70,25 +70,35 @@ resource synapseWorkspace 'Microsoft.Synapse/workspaces@2021-06-01' = {
       }
     }
   }
-  resource adxPool 'kustoPools@2021-06-01-preview' = {
-    name: adxName
+}
+
+resource adxPool 'Microsoft.Synapse/workspaces/kustoPools@2021-06-01-preview' = {
+  name: adxName
+  location: location
+  parent: synapseWorkspace
+  sku: {
+    name: 'Storage optimized'
+    size: 'Medium'
+    capacity: 2 
+  }
+  properties: {
+    enableStreamingIngest: false
+    enablePurge: false
+    optimizedAutoscale: {
+      minimum: 2
+      maximum: 6
+      version: 1
+      isEnabled: true
+    }
+  }
+  resource database 'databases@2021-06-01-preview' = {
+    kind: 'ReadWrite'
+    name: 'NYCTaxi'
     location: location
-    sku: {
-      name: 'Storage optimized'
-      size: 'Medium'
-      capacity: 2 
-    }
     properties: {
-      enableStreamingIngest: false
-      enablePurge: false
-      optimizedAutoscale: {
-        minimum: 2
-        maximum: 6
-        version: 1
-        isEnabled: true
-      }
+      softDeletePeriod: 'P60D'
+      hotCachePeriod: 'P365D'
     }
-    
   }
 }
 
