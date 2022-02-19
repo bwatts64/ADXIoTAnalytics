@@ -74,13 +74,13 @@ resource synapseWorkspace 'Microsoft.Synapse/workspaces@2021-06-01' = {
     name: adxName
     location: location
     sku: {
-      name: 'Compute optimized'
+      name: 'Storage optimized'
       size: 'Medium'
       capacity: 2 
     }
     properties: {
-      enableStreamingIngest: true
-      enablePurge: true
+      enableStreamingIngest: false
+      enablePurge: false
       optimizedAutoscale: {
         minimum: 2
         maximum: 6
