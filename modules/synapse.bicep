@@ -26,7 +26,7 @@ resource synapseWorkspace 'Microsoft.Synapse/workspaces@2021-06-01' = {
     name: 'allowAll'
     properties: {
       startIpAddress: '0.0.0.0'
-      endIpAddress: '0.0.0.0'
+      endIpAddress: '255.255.255.255'
     }
   }
   resource managedIdentitySQLControl 'managedIdentitySqlControlSettings@2021-06-01' = {
