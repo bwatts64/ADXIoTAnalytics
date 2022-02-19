@@ -3,6 +3,8 @@ param adxName string
 param location string = resourceGroup().location
 param saResourceId string
 param saName string
+param sqlName string
+param sparkName string
 
 
 resource synapseWorkspace 'Microsoft.Synapse/workspaces@2021-06-01' = {
@@ -38,7 +40,7 @@ resource synapseWorkspace 'Microsoft.Synapse/workspaces@2021-06-01' = {
     }
   }
   resource sqlPool 'sqlPools' = {
-    name: 'demoSqlPool'
+    name: sqlName
     location: location
     sku: {
        name: 'DW200c'
@@ -46,7 +48,7 @@ resource synapseWorkspace 'Microsoft.Synapse/workspaces@2021-06-01' = {
     }
   }
   resource spartk 'bigDataPools@2021-06-01' = {
-    name: 'demoSpark'
+    name: sparkName
     location: location
     properties: {
       sparkVersion: '3.1'
@@ -70,34 +72,32 @@ resource synapseWorkspace 'Microsoft.Synapse/workspaces@2021-06-01' = {
       }
     }
   }
-}
-
-resource adxPool 'Microsoft.Synapse/workspaces/kustoPools@2021-06-01-preview' = {
-  name: adxName
-  location: location
-  parent: synapseWorkspace
-  sku: {
-    name: 'Storage optimized'
-    size: 'Medium'
-    capacity: 2 
-  }
-  properties: {
-    enableStreamingIngest: false
-    enablePurge: false
-    optimizedAutoscale: {
-      minimum: 2
-      maximum: 6
-      version: 1
-      isEnabled: true
-    }
-  }
-  resource database 'databases@2021-06-01-preview' = {
-    kind: 'ReadWrite'
-    name: 'NYCTaxi'
+  resource adxPool 'kustoPools@2021-06-01-preview' = {
+    name: adxName
     location: location
+    sku: {
+      name: 'Storage optimized'
+      size: 'Medium'
+      capacity: 2 
+    }
     properties: {
-      softDeletePeriod: 'P60D'
-      hotCachePeriod: 'P365D'
+      enableStreamingIngest: false
+      enablePurge: false
+      optimizedAutoscale: {
+        minimum: 2
+        maximum: 6
+        version: 1
+        isEnabled: true
+      }
+    }
+    resource database 'databases@2021-06-01-preview' = {
+      kind: 'ReadWrite'
+      name: 'NYCTaxi'
+      location: location
+      properties: {
+        softDeletePeriod: 'P365D'
+        hotCachePeriod: 'P60D'
+      }
     }
   }
 }

@@ -83,6 +83,8 @@ module syanpse './modules/synapse.bicep' = if(deploySynapse) {
     location: deploymentLocation
     saName: storageAccount.outputs.saName
     saResourceId: storageAccount.outputs.saId
+    sqlName: 'demoSqlPool${deploymentSuffix}'
+    sparkName: 'demoSpark${deploymentSuffix}'
   }
 }
 
