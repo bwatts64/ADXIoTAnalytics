@@ -79,7 +79,7 @@ module syanpse './modules/synapse.bicep' = if(deploySynapse) {
   name: '${synapseName}${deploymentSuffix}'
   params: {
     synapseName: '${synapseName}${deploymentSuffix}'
-    adxName: adxName
+    adxName: '${adxName}${deploymentSuffix}'
     location: deploymentLocation
     saName: storageAccount.outputs.saName
     saResourceId: storageAccount.outputs.saId

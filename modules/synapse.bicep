@@ -88,15 +88,7 @@ resource synapseWorkspace 'Microsoft.Synapse/workspaces@2021-06-01' = {
         isEnabled: true
       }
     }
-    resource database 'databases@2021-06-01-preview' = {
-      kind: 'ReadWrite'
-      name: 'NYCTaxi'
-      location: location
-      properties: {
-        softDeletePeriod: 'P60D'
-        hotCachePeriod: 'P365D'
-      }
-    }
+    
   }
 }
 

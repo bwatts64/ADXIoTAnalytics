@@ -9,7 +9,7 @@
         "value": "demosynapse"
       },
       "adxName": {
-        "value": "adxpm"
+        "value": "synapseadxpool"
       },
       "adxSKU": {
         "value": "Standard_D11_v2"
