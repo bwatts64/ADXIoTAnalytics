@@ -5,6 +5,9 @@
       "deploymentLocation": {
         "value": "eastus"
       },
+      "synapseName": {
+        "value": "demosynapse"
+      },
       "adxName": {
         "value": "adxpm"
       },
@@ -27,6 +30,12 @@
         "value": false
       },
       "deployADT": {
+        "value": false
+      },
+      "deployIoT": {
+        "value": true
+      },
+      "deploySynapse": {
         "value": false
       },
       "IoTCentralType": {

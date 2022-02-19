@@ -56,10 +56,16 @@ function deploy_azure_services() {
             --template-file main.bicep \
             --parameters deploymentSuffix=$randomNum principalId=$principalId @iotanalyticsStore.parameters.json \
             --only-show-errors --output none
-    else
+    else if [ $iotCType -eq 2 ]
+    then
         az deployment group create -n $deploymentName -g $rgName \
             --template-file main.bicep \
             --parameters deploymentSuffix=$randomNum principalId=$principalId @iotanalyticsLogistics.parameters.json \
+            --only-show-errors --output none
+    else
+        az deployment group create -n $deploymentName -g $rgName \
+            --template-file main.bicep \
+            --parameters deploymentSuffix=$randomNum principalId=$principalId @synapseanalyticsNYC.parameters.json \
             --only-show-errors --output none
     fi
 }
@@ -82,6 +88,8 @@ function get_deployment_output() {
     eventHubConnectionString=$(az deployment group show -n $deploymentName -g $rgName --query properties.outputs.eventHubConnectionString.value --output tsv)
     deployADX=$(az deployment group show -n $deploymentName -g $rgName --query properties.outputs.deployADX.value --output tsv)
     deployADT=$(az deployment group show -n $deploymentName -g $rgName --query properties.outputs.deployADT.value --output tsv)
+    deploySynapse=$(az deployment group show -n $deploymentName -g $rgName --query properties.outputs.deploySynapse.value --output tsv)
+    deployIoT=$(az deployment group show -n $deploymentName -g $rgName --query properties.outputs.deployIoT.value --output tsv)
     iotCentralType=$(az deployment group show -n $deploymentName -g $rgName --query properties.outputs.iotCentralType.value --output tsv)
 }
 
@@ -238,14 +246,16 @@ principalId=$(az ad signed-in-user show --query objectId -o tsv)
 echo "Please select from below deployment options"
 echo "     1. ADX IoT Workshop"
 echo "     2. ADX IoT Open Hack"
+echo "     3. Synapse NYC Taxi Demo"
 read -p "Enter number:" iotCType
 
-while [ $iotCType != 1 ] && [ $iotCType != 2 ]
+while [ $iotCType != 1 ] && [ $iotCType != 2 ] && [ $iotCType != 3 ]
 do
     echo "UNKNOWN OPTION SELECTED :("
     echo "Please select from below deployment options"
     echo "     1. ADX IoT Workshop"
     echo "     2. ADX IoT Open Hack"
+    echo "     3. Synapse NYC Taxi Demo"
     read -p "Enter number:" iotCType
 done
 
@@ -257,8 +267,11 @@ banner # Show Welcome banner
 if [ $iotCType -eq 1 ]
 then
     echo '1. Starting deployment of IoT Analytics Lab'
-else
+else if [ $iotCType -eq 2 ]
+then
     echo '1. Starting deployment of IoT Open Hack Environment'
+else
+    echo '1. Starting deployment of Synapse NYC Taxi Environment'
 fi
 
 add_required_extensions & # Install/Update required eztensions
@@ -278,8 +291,11 @@ then
     spinner "Configuring ADX Cluster"
 fi
 
-# Get/Refresh IoT Central Token 
-az account get-access-token --resource https://apps.azureiotcentral.com --only-show-errors --output none
+if [ $deployIoT == true ]
+then
+    # Get/Refresh IoT Central Token 
+    az account get-access-token --resource https://apps.azureiotcentral.com --only-show-errors --output none
+fi
 
 if [ $deployADT == true ] 
 then
@@ -288,13 +304,14 @@ then
 fi
 
 # Complete configuration
-if [ $deployADT == true ] 
+if [ $deployADT == true ] && [ $deployIoT == true ]
 then
     echo "Creating $numDevices devices on IoT Central: $iotCentralName ($iotCentralAppID) and Digital Twins: $dtName"
     deploy_thermostat_devices # Deploy Thermostat simulated devices
     configure_IoT_Central_output & # On IoT Central, create an Event Hub export and destination with json payload
     spinner " Creating IoT Central App export and destination on IoT Central: $iotCentralName ($iotCentralAppID)"
-else
+else if [ $deployIoT == true ]
+then
     echo "Creating $numDevices devices on IoT Central: $iotCentralName ($iotCentralAppID)"
     deploy_thermostat_devices # Deploy Thermostat simulated devices
     configure_IoT_Central_output & # On IoT Central, create an Event Hub export and destination with json payload

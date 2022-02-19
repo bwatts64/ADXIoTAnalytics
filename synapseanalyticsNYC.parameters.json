@@ -27,16 +27,16 @@
         "value": 36
       },
       "deployADX": {
-        "value": true
+        "value": false
       },
       "deployADT": {
-        "value": true
+        "value": false
       },
       "deployIoT": {
-        "value": true
+        "value": false
       },
       "deploySynapse": {
-        "value": false
+        "value": true
       },
       "IoTCentralType": {
         "value": "Store Analytics"

@@ -1,4 +1,5 @@
 param deploymentLocation string = 'eastus'
+param synapseName string = 'demoSynapse'
 param adxName string = 'adxclusteriot'
 param adxSKU string = 'Standard_D11_v2'
 param eventHubName string = 'eventhubiot'
@@ -10,6 +11,8 @@ param numDevices int
 param principalId string
 param deployADX bool
 param deployADT bool
+param deploySynapse bool
+param deployIoT bool
 @allowed([
   'Store Analytics'
   'Logistics Analytics'
@@ -22,7 +25,7 @@ param IoTCentralType string = 'Store Analytics'
 param iotTemplate string = 'iotc-store'
 
 
-module iotStoreCentralApp './modules/iotcentral.bicep' = {
+module iotStoreCentralApp './modules/iotcentral.bicep' = if(deployIoT){
   name: iotCentralName
   params: {
     iotCentralName: '${iotCentralName}${deploymentSuffix}'
@@ -72,6 +75,17 @@ module digitalTwin './modules/digitaltwin.bicep' = if(deployADT) {
   }
 }
 
+module syanpse './modules/synapse.bicep' = if(deploySynapse) {
+  name: '${synapseName}${deploymentSuffix}'
+  params: {
+    synapseName: '${synapseName}${deploymentSuffix}'
+    adxName: adxName
+    location: deploymentLocation
+    saName: storageAccount.outputs.saName
+    saResourceId: storageAccount.outputs.saId
+  }
+}
+
 // Get Azure Event Hubs Data receiver role definition
 @description('This is the built-in Azure Event Hubs Data receiver role. See https://docs.microsoft.com/azure/role-based-access-control/built-in-roles')
 resource eventHubsDataReceiverRoleDefinition 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
@@ -111,4 +125,6 @@ output adxClusterId string = deployADX ? adxCluster.outputs.adxClusterId : 'na'
 output location string = deploymentLocation
 output deployADX bool = deployADX
 output deployADT bool = deployADT
+output deployIoT bool = deployIoT
+output deploySynapse bool = deploySynapse
 output iotCentralType string = IoTCentralType
