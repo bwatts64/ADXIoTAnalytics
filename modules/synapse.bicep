@@ -89,6 +89,7 @@ resource synapseWorkspace 'Microsoft.Synapse/workspaces@2021-06-01' = {
         version: 1
         isEnabled: true
       }
+      workspaceUID: synapseWorkspace.properties.workspaceUID
     }
     resource database 'databases@2021-06-01-preview' = {
       kind: 'ReadWrite'
