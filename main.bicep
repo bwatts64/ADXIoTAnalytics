@@ -143,6 +143,7 @@ output saId string = storageAccount.outputs.saId
 output adxName string = deployADX ? adxCluster.outputs.adxName : 'na' 
 output adxClusterId string = deployADX ? adxCluster.outputs.adxClusterId : 'na'
 output location string = deploymentLocation
+output synapseWSName string = deploySynapse ? syanpse.outputs.synapseWSName : 'na'
 output deployADX bool = deployADX
 output deployADT bool = deployADT
 output deployIoT bool = deployIoT

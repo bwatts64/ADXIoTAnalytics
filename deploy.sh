@@ -119,6 +119,29 @@ function configure_ADX_cluster() {
         --account-key $saKey --account-name $saName --only-show-errors --output none  ;\
 }
 
+function configure_ADX_pool() {
+    az storage blob upload -f config/configSynapse.kql -c adxscript -n configSynapse.kql \
+        --account-key $saKey --account-name $saName --only-show-errors --output none  ;\
+    blobURI="https://$saName.blob.core.windows.net/adxscript/configSynapse.kql"  ;\
+    blobSAS=$(az storage blob generate-sas --account-name $saName --container-name adxscript \
+        --name configDB.kql --permissions acdrw --expiry $tomorrow --account-key $saKey --output tsv)  ;\
+    az synapse kql-script create --kusto-pool-name $adxName --kusto-database-name IoTAnalytic  \
+        --workspace-name  --script-url $blobURI --script-url-sas-token $blobSAS \
+        --resource-group $rgName --name 'configDB' --only-show-errors --output none  ;\
+    az kusto data-connection event-hub create --cluster-name $adxName --name "IoTAnalytics" \
+        --database-name "IoTAnalytics" --location $location --consumer-group '$Default' \
+        --event-hub-resource-id $eventHubResourceId --managed-identity-resource-id $adxResoureId \
+        --data-format 'JSON' --table-name 'StageIoTRawData' --mapping-rule-name 'StageIoTRawData_mapping' \
+        --compression 'None' --resource-group $rgName --only-show-errors --output none
+
+    az kusto data-connection event-grid create --cluster-name $adxName -g $rgName --database-name "IoTAnalytics" \
+        --table-name "Thermostats" --name "HistoricalLoad" --ignore-first-record true --data-format csv  \
+        --mapping-rule-name "Thermostats_mapping" --storage-account-resource-id $saId \
+        --consumer-group '$Default' --event-hub-resource-id $eventHubHistoricId
+    az storage blob upload -f config/Thermostat_January2022.csv -c adxscript -n Thermostat_January2022.csv \
+        --account-key $saKey --account-name $saName --only-show-errors --output none  ;\
+}
+
 function create_digital_twin_models() {
     az dt model create -n $dtName --from-directory ./dtconfig  --only-show-errors --output none ; \
     az dt twin create -n $dtName --dtmi "dtmi:StageIoTRawData:Office;1" --twin-id Dallas --only-show-errors --output none; \
@@ -289,6 +312,12 @@ if [ $deployADX == true ]
 then
     configure_ADX_cluster & # Configure ADX cluster
     spinner "Configuring ADX Cluster"
+fi
+
+if [ $deploySynapse == true ]
+then
+    configure_ADX_pool & # Configure ADX cluster
+    spinner "Configuring Synapse ADX Pool"
 fi
 
 if [ $deployIoT == true ]

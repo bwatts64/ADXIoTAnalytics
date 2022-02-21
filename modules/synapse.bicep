@@ -104,6 +104,7 @@ resource synapseWorkspace 'Microsoft.Synapse/workspaces@2021-06-01' = {
 }
 
 output synapseSystemId string = synapseWorkspace.identity.principalId
+output synapseWSName string = synapseWorkspace.name
 
 
 
