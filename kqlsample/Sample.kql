@@ -132,6 +132,7 @@ Thermostats
 .show function GetDevicesbyStore
 
 //Here is an example of the query. Note that the below ADT endpoint won't match yours
+//.create-or-alter function with (folder = "Analytics/IoT", skipvalidation = "true") GetDevicesbyStore(Office:string) 
 //{
 //	let ADTendpoint = "https://digitaltwinpm24.api.eus.digitaltwins.azure.net";
 //	let ADTquery = strcat("SELECT T.$dtId as Office, F.$dtId as Floor, D.$dtId as DeviceId FROM DIGITALTWINS T JOIN F RELATED T.officecontainsfloors JOIN D RELATED F.floorcontainsdevices where T.$dtId='", Office, "'");
