@@ -29,6 +29,9 @@
       "deployADT": {
         "value": false
       },
+      "deployStorage": {
+        "value": false
+      },
       "IoTCentralType": {
         "value": "Logistics Analytics"
       },
